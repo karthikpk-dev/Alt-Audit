@@ -9,11 +9,13 @@ import {
   ExternalLink,
   Calendar,
   Filter,
-  Search
+  Search,
+  BarChart3
 } from 'lucide-react';
 import { ScanResultSummary, ScanFilters, ScanStatus } from '@/types';
 import apiClient from '@/services/api';
 import toast from 'react-hot-toast';
+import ScanChartModal from './ScanChartModal';
 
 interface ScanHistoryProps {
   onScanSelect?: (scanId: number) => void;
@@ -28,6 +30,8 @@ const ScanHistory: React.FC<ScanHistoryProps> = ({ onScanSelect, refreshTrigger 
   const [filters, setFilters] = useState<ScanFilters>({});
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showChartModal, setShowChartModal] = useState(false);
+  const [selectedScan, setSelectedScan] = useState<ScanResultSummary | null>(null);
 
   const pageSize = 10;
 
@@ -83,6 +87,16 @@ const ScanHistory: React.FC<ScanHistoryProps> = ({ onScanSelect, refreshTrigger 
 
   const loadMore = () => {
     setCurrentPage(prev => prev + 1);
+  };
+
+  const handleShowChart = (scan: ScanResultSummary) => {
+    setSelectedScan(scan);
+    setShowChartModal(true);
+  };
+
+  const handleCloseChart = () => {
+    setShowChartModal(false);
+    setSelectedScan(null);
   };
 
   const getStatusIcon = (status: string) => {
@@ -266,13 +280,22 @@ const ScanHistory: React.FC<ScanHistoryProps> = ({ onScanSelect, refreshTrigger 
                   
                   <div className="flex items-center space-x-2 ml-4">
                     {scan.scan_status === 'completed' && (
-                      <button
-                        onClick={() => onScanSelect?.(scan.id)}
-                        className="btn btn-ghost btn-sm"
-                        title="View details"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </button>
+                      <>
+                        <button
+                          onClick={() => onScanSelect?.(scan.id)}
+                          className="btn btn-ghost btn-sm"
+                          title="View details"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleShowChart(scan)}
+                          className="btn btn-ghost btn-sm"
+                          title="View charts and analytics for this scan"
+                        >
+                          <BarChart3 className="h-4 w-4" />
+                        </button>
+                      </>
                     )}
                     
                     <a
@@ -319,6 +342,13 @@ const ScanHistory: React.FC<ScanHistoryProps> = ({ onScanSelect, refreshTrigger 
           </div>
         )}
       </div>
+
+      {/* Chart Modal */}
+      <ScanChartModal
+        isOpen={showChartModal}
+        onClose={handleCloseChart}
+        scan={selectedScan}
+      />
     </div>
   );
 };

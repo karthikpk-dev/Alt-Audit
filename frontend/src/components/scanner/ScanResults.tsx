@@ -8,12 +8,14 @@ import {
   RefreshCw,
   Trash2,
   Download,
-  Eye
+  Eye,
+  BarChart3
 } from 'lucide-react';
 import { ScanResult, ScanResultSummary } from '@/types';
 import apiClient from '@/services/api';
 import toast from 'react-hot-toast';
 import ImageList from './ImageList';
+import ScanChartModal from './ScanChartModal';
 
 interface ScanResultsProps {
   scanId: number;
@@ -31,6 +33,7 @@ const ScanResults: React.FC<ScanResultsProps> = ({
   const [isRetrying, setIsRetrying] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [showImages, setShowImages] = useState(false);
+  const [showChartModal, setShowChartModal] = useState(false);
 
   useEffect(() => {
     fetchScanDetails();
@@ -89,6 +92,14 @@ const ScanResults: React.FC<ScanResultsProps> = ({
     } catch (error) {
       toast.error('Failed to export scan data');
     }
+  };
+
+  const handleShowChart = () => {
+    setShowChartModal(true);
+  };
+
+  const handleCloseChart = () => {
+    setShowChartModal(false);
   };
 
   const getStatusIcon = (status: string) => {
@@ -255,6 +266,14 @@ const ScanResults: React.FC<ScanResultsProps> = ({
                   {showImages ? 'Hide' : 'View'} Images
                 </button>
                 <button
+                  onClick={handleShowChart}
+                  className="btn btn-outline btn-sm"
+                  title="View charts and analytics for this scan"
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Scan Charts
+                </button>
+                <button
                   onClick={handleExport}
                   className="btn btn-outline btn-sm"
                 >
@@ -290,6 +309,15 @@ const ScanResults: React.FC<ScanResultsProps> = ({
       {/* Image List */}
       {showImages && scan.scan_status === 'completed' && (
         <ImageList scanId={scanId} />
+      )}
+
+      {/* Chart Modal */}
+      {scan && (
+        <ScanChartModal
+          isOpen={showChartModal}
+          onClose={handleCloseChart}
+          scan={scan}
+        />
       )}
     </div>
   );
