@@ -168,7 +168,6 @@ export interface ScanFilters {
 
 export interface ImageFilters {
   has_alt_only?: boolean;
-  is_decorative?: boolean;
   min_width?: number;
   max_width?: number;
   min_height?: number;

@@ -178,23 +178,6 @@ const ImageList: React.FC<ImageListProps> = ({ scanId }) => {
               </select>
             </div>
             
-            <div>
-              <label className="label">Type</label>
-              <select
-                value={filters.is_decorative ? 'true' : filters.is_decorative === false ? 'false' : ''}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  handleFilterChange({
-                    is_decorative: value === '' ? undefined : value === 'true'
-                  });
-                }}
-                className="input"
-              >
-                <option value="">All Types</option>
-                <option value="false">Content Images</option>
-                <option value="true">Decorative Images</option>
-              </select>
-            </div>
           </div>
         </div>
       )}

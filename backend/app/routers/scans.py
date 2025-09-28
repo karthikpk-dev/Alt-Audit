@@ -257,7 +257,10 @@ async def get_scan_images(
         if has_alt_only is not None:
             query = query.filter(models.ImageDetail.has_alt_text == has_alt_only)
         
-        images = query.order_by(models.ImageDetail.created_at.asc()).offset(skip).limit(limit).all()
+        images = query.order_by(
+            models.ImageDetail.has_alt_text.asc(),  # False (missing alt) first, then True (with alt)
+            models.ImageDetail.created_at.asc()     # Secondary sort by creation time
+        ).offset(skip).limit(limit).all()
         
         return [schemas.ImageDetailResponse.from_orm(img) for img in images]
         
