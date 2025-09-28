@@ -264,76 +264,6 @@ class URLValidator:
             return False, f"Error resolving URL: {str(e)}", None
 
 
-class ContentValidator:
-    """Content validation utilities."""
-    
-    MAX_CONTENT_SIZE = 10 * 1024 * 1024  # 10MB
-    ALLOWED_CONTENT_TYPES = [
-        'text/html',
-        'text/plain',
-        'application/xhtml+xml',
-        'application/xml',
-        'text/xml',
-    ]
-    
-    def validate_content(self, content: bytes, content_type: str) -> Tuple[bool, str]:
-        """
-        Validate content for security and size.
-        
-        Args:
-            content: Content bytes
-            content_type: MIME content type
-            
-        Returns:
-            Tuple[bool, str]: (is_valid, error_message)
-        """
-        # Check content size
-        if len(content) > self.MAX_CONTENT_SIZE:
-            return False, f"Content too large (max {self.MAX_CONTENT_SIZE} bytes)"
-        
-        # Check content type (handle charset and other parameters)
-        content_type_base = content_type.split(';')[0].strip().lower()
-        if content_type_base not in [ct.lower() for ct in self.ALLOWED_CONTENT_TYPES]:
-            return False, f"Content type '{content_type}' not allowed"
-        
-        # Check for suspicious content patterns
-        if self._has_suspicious_content(content):
-            return False, "Content contains suspicious patterns"
-        
-        return True, ""
-    
-    def _has_suspicious_content(self, content: bytes) -> bool:
-        """
-        Check for suspicious content patterns.
-        
-        Args:
-            content: Content bytes to check
-            
-        Returns:
-            bool: True if suspicious patterns found
-        """
-        # Convert to string for pattern matching
-        try:
-            content_str = content.decode('utf-8', errors='ignore')
-        except:
-            return True  # If we can't decode, consider it suspicious
-        
-        # Only check for truly dangerous patterns, not normal HTML
-        dangerous_patterns = [
-            r'javascript:\s*eval\s*\(',  # JavaScript eval
-            r'vbscript:',  # VBScript URLs
-            r'data:text/html.*<script',  # Data URIs with scripts
-            r'<script[^>]*>.*?document\.write.*?</script>',  # Document write scripts
-            r'<script[^>]*>.*?innerHTML.*?</script>',  # InnerHTML manipulation
-        ]
-        
-        for pattern in dangerous_patterns:
-            if re.search(pattern, content_str, re.IGNORECASE | re.DOTALL):
-                return True
-        
-        return False
-
-
 def validate_url_safe(url: str) -> str:
     """
     Validate URL and return cleaned version.
@@ -365,25 +295,3 @@ def validate_url_safe(url: str) -> str:
     return f"{parsed.scheme}://{parsed.netloc}{parsed.path}{'?' + parsed.query if parsed.query else ''}"
 
 
-def validate_content_safe(content: bytes, content_type: str) -> bytes:
-    """
-    Validate content and return if safe.
-    
-    Args:
-        content: Content bytes
-        content_type: MIME content type
-        
-    Returns:
-        bytes: Validated content
-        
-    Raises:
-        ValidationError: If content is invalid
-        SecurityError: If content poses security risk
-    """
-    validator = ContentValidator()
-    
-    is_valid, error = validator.validate_content(content, content_type)
-    if not is_valid:
-        raise ValidationError(f"Invalid content: {error}")
-    
-    return content
