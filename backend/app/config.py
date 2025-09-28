@@ -21,7 +21,7 @@ class Settings(BaseSettings):
         "your-secret-key-change-in-production"
     )
     algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
-    access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
     
     # API
     api_v1_str: str = os.getenv("API_V1_STR", "/api/v1")
