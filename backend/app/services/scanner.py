@@ -72,13 +72,10 @@ class URLScanner:
             
             # Fetch content
             content, content_type = await self._fetch_content(validated_url)
-            
-            # Validate content
-            validated_content = validate_content_safe(content, content_type)
-            
+                       
             # Analyze images
             analyzer = ImageAnalyzer(validated_url, self.timeout)
-            analysis_results = analyzer.analyze_images(validated_content.decode('utf-8', errors='ignore'))
+            analysis_results = analyzer.analyze_images(content.decode('utf-8', errors='ignore'))
             
             # Calculate scan duration
             scan_duration_ms = int((time.time() - start_time) * 1000)
