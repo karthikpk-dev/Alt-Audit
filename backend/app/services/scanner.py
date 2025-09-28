@@ -4,7 +4,7 @@ from typing import Dict, Optional, Tuple
 import httpx
 
 from ..utils.validators import validate_url_safe, validate_content_safe
-from ..utils.exceptions import ScanError
+from ..utils.exceptions import ScanError, ValidationError, SecurityError
 from .image_analyzer import ImageAnalyzer
 from ..config import settings
 
